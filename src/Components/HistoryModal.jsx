@@ -56,7 +56,7 @@ export const HistoryModal = ({ open, onClose }) => {
                   <div>
                     <strong>{order.id}</strong>
                     <span>
-                      {FormatDate(order.paidAt)} · {order.method}
+                      {order.customerName || "Pemesan"} · {FormatDate(order.paidAt)} · {order.method}
                     </span>
                   </div>
                   <b>{FormatRupiah(order.total)}</b>

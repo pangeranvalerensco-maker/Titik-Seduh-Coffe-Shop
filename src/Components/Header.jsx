@@ -278,11 +278,7 @@ export const Header = ({
               className={`icon-button ${
                 openPanel === "notifications" ? "is-active" : ""
               }`}
-              onClick={() =>
-                setOpenPanel((current) =>
-                  current === "notifications" ? null : "notifications",
-                )
-              }
+              onClick={() => OpenFull(onOpenNotifications)}
               aria-label="Buka notifikasi"
               aria-expanded={openPanel === "notifications"}
               title="Notifikasi"
@@ -359,11 +355,7 @@ export const Header = ({
               className={`icon-button ${
                 openPanel === "history" ? "is-active" : ""
               }`}
-              onClick={() =>
-                setOpenPanel((current) =>
-                  current === "history" ? null : "history",
-                )
-              }
+              onClick={() => OpenFull(onOpenHistory)}
               aria-label="Buka riwayat pesanan"
               aria-expanded={openPanel === "history"}
               title="Riwayat"
@@ -392,7 +384,7 @@ export const Header = ({
                       <div className="quick-order" key={order.id}>
                         <div>
                           <strong>{order.id}</strong>
-                          <span>{FormatDate(order.paidAt)}</span>
+                          <span>{order.customerName || "Pemesan"} · {FormatDate(order.paidAt)}</span>
                         </div>
                         <b>{FormatRupiah(order.total)}</b>
                       </div>
@@ -424,11 +416,7 @@ export const Header = ({
               className={`icon-button icon-button-cart ${
                 openPanel === "cart" ? "is-active" : ""
               }`}
-              onClick={() =>
-                setOpenPanel((current) =>
-                  current === "cart" ? null : "cart",
-                )
-              }
+              onClick={() => OpenFull(OpenCart)}
               aria-label="Buka keranjang"
               aria-expanded={openPanel === "cart"}
               title="Keranjang"

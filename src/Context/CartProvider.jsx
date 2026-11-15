@@ -196,7 +196,12 @@ export const CartProvider = ({ children }) => {
 
   const totals = useMemo(() => CalculateTotals(cart, promo), [cart, promo]);
 
-  const Checkout = useCallback(() => {
+  const Checkout = useCallback((customerName) => {
+    const normalizedName = String(customerName || "").trim();
+    if (!normalizedName) {
+      ShowToast("Nama pemesan wajib diisi", "Isi nama sebelum melanjutkan pembayaran.", "warning");
+      return null;
+    }
     if (cart.length === 0) {
       ShowToast("Keranjang kosong", "Tambahkan menu sebelum checkout.", "warning");
       return null;
@@ -204,6 +209,7 @@ export const CartProvider = ({ children }) => {
 
     const order = {
       id: `TS-${Date.now().toString().slice(-6)}`,
+      customerName: normalizedName,
       items: cart.map((item) => ({ ...item })),
       subtotal: totals.subtotal,
       discount: totals.discount,

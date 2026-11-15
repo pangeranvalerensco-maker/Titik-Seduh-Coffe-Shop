@@ -10,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import { UseCart } from "../Context/CartContext";
+import { UseToast } from "../Context/ToastContext";
 import { FormatDate, FormatRupiah } from "../Utils/Pricing";
 import { ConfirmModal } from "./ConfirmModal";
 import { Modal } from "./Modal";
@@ -30,12 +31,15 @@ export const CartDrawer = () => {
     totals,
     Checkout,
     isCartOpen,
+    OpenCart,
     CloseCart,
   } = UseCart();
   const [promoInput, setPromoInput] = useState("");
+  const [customerName, setCustomerName] = useState("");
   const [confirmClear, setConfirmClear] = useState(false);
   const [confirmCheckout, setConfirmCheckout] = useState(false);
   const [receipt, setReceipt] = useState(null);
+  const { ShowToast } = UseToast();
 
   useEffect(() => {
     if (!isCartOpen) return undefined;
@@ -60,13 +64,39 @@ export const CartDrawer = () => {
     if (ApplyPromo(promoInput)) setPromoInput("");
   };
 
-  const handleCheckout = () => {
-    const order = Checkout();
-    setConfirmCheckout(false);
-    if (order) {
-      setReceipt(order);
-      CloseCart();
+  const handleCheckout = (event) => {
+    event.preventDefault();
+    const name = customerName.trim();
+    if (!name) {
+      ShowToast("Nama pemesan wajib diisi", "Isi nama sebelum melanjutkan pembayaran.", "warning");
+      return;
     }
+    const order = Checkout(name);
+    if (order) {
+      setConfirmCheckout(false);
+      setCustomerName("");
+      setReceipt(order);
+    }
+  };
+
+  const openCheckout = () => {
+    CloseCart();
+    setConfirmCheckout(true);
+  };
+
+  const cancelCheckout = () => {
+    setConfirmCheckout(false);
+    OpenCart();
+  };
+
+  const openClearConfirmation = () => {
+    CloseCart();
+    setConfirmClear(true);
+  };
+
+  const cancelClear = () => {
+    setConfirmClear(false);
+    OpenCart();
   };
 
   return (
@@ -236,7 +266,7 @@ export const CartDrawer = () => {
               <button
                 type="button"
                 className="button button-primary button-full checkout-button"
-                onClick={() => setConfirmCheckout(true)}
+                onClick={openCheckout}
               >
                 <Receipt size={16} />
                 Checkout sekarang
@@ -244,7 +274,7 @@ export const CartDrawer = () => {
               <button
                 type="button"
                 className="button button-ghost button-full"
-                onClick={() => setConfirmClear(true)}
+                onClick={openClearConfirmation}
               >
                 Kosongkan keranjang
               </button>
@@ -259,7 +289,7 @@ export const CartDrawer = () => {
           message="Semua item di keranjang akan dihapus. Tindakan ini tidak bisa dibatalkan."
           confirmLabel="Ya, kosongkan"
           tone="danger"
-          onCancel={() => setConfirmClear(false)}
+          onCancel={cancelClear}
           onConfirm={() => {
             ClearCart();
             setConfirmClear(false);
@@ -268,13 +298,45 @@ export const CartDrawer = () => {
       )}
 
       {confirmCheckout && (
-        <ConfirmModal
+        <Modal
           title="Konfirmasi pembayaran"
-          message={`Total yang akan dibayar ${FormatRupiah(totals.total)} via QRIS. Struk akan tersimpan di riwayat.`}
-          confirmLabel="Bayar sekarang"
-          onCancel={() => setConfirmCheckout(false)}
-          onConfirm={handleCheckout}
-        />
+          eyebrow="// checkout"
+          onClose={cancelCheckout}
+          size="small"
+          className="checkout-modal"
+        >
+          <form className="checkout-form" onSubmit={handleCheckout}>
+            <label htmlFor="customer-name">Nama pemesan</label>
+            <input
+              id="customer-name"
+              name="customerName"
+              type="text"
+              autoComplete="name"
+              maxLength={60}
+              value={customerName}
+              onChange={(event) => setCustomerName(event.target.value)}
+              placeholder="Masukkan nama pemesan"
+              required
+              autoFocus
+            />
+            <p>
+              Total {FormatRupiah(totals.total)} via QRIS. Struk dan nama pemesan
+              akan tersimpan di riwayat.
+            </p>
+            <div className="modal-actions">
+              <button
+                type="button"
+                className="button button-ghost"
+                onClick={cancelCheckout}
+              >
+                Batal
+              </button>
+              <button type="submit" className="button button-primary">
+                Bayar sekarang
+              </button>
+            </div>
+          </form>
+        </Modal>
       )}
 
       {receipt && (
@@ -291,7 +353,7 @@ export const CartDrawer = () => {
             <div>
               <strong>Pembayaran berhasil</strong>
               <p>
-                {FormatDate(receipt.paidAt)} · {receipt.method}
+                {receipt.customerName} · {FormatDate(receipt.paidAt)} · {receipt.method}
               </p>
             </div>
           </div>

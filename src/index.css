@@ -2465,6 +2465,45 @@ button:disabled {
   line-height: 1.8;
 }
 
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.checkout-form label {
+  color: var(--ink-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.checkout-form input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 2px;
+  outline: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+.checkout-form input:focus {
+  border-color: var(--forest);
+  box-shadow: 0 0 0 3px rgba(38, 63, 48, 0.1);
+}
+
+.checkout-form > p {
+  color: var(--ink-2);
+  font-size: 0.79rem;
+  line-height: 1.7;
+}
+
+.checkout-form .modal-actions {
+  margin-top: 0.55rem;
+}
+
 .star-row-input {
   gap: 0.18rem;
 }
